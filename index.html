@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<!-- 2D Fluid Solver with Obstacles and Particles | Author: Ilya Tsivilskiy -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2D Fluid Solver with Obstacles and Particles</title>
+  <link rel="stylesheet" href="./css/index.css">
+</head>
+<body>
+  <h1>2D Fluid with Obstacles and Particles</h1>
+  <div class="toolbar">
+    <button type="button" id="mode-obstacle" class="active">Draw obstacles</button>
+    <button type="button" id="mode-eraser">Erase</button>
+    <button type="button" id="mode-velocity">Inject velocity</button>
+    <button type="button" id="mode-particles">Inject particles</button>
+    <button type="button" id="btn-reset">Reset</button>
+    <button type="button" id="btn-reset-obstacles">Reset obstacles</button>
+  </div>
+  <div id="sim-time" class="sim-time">t = 0.000 [s]  |  0 FPS</div>
+  <div id="canvas-wrap">
+    <div class="bc-panel bc-top" id="bc-top">
+      <label>Top</label>
+      <span class="bc-input-wrap"><span class="bc-axis">Vx</span><span class="bc-eq">=</span><input type="number" id="bc-top-ux" placeholder="0.00" step="0.01" value="0.00"></span>
+      <span class="bc-input-wrap"><span class="bc-axis">Vy</span><span class="bc-eq">=</span><input type="number" id="bc-top-uy" placeholder="0.00" step="0.01" value="0.00"></span>
+      <label class="zero-grad"><input type="checkbox" id="bc-top-zerograd"> Zero ∇</label>
+    </div>
+    <div class="bc-panel bc-bottom" id="bc-bottom">
+      <label>Bottom</label>
+      <span class="bc-input-wrap"><span class="bc-axis">Vx</span><span class="bc-eq">=</span><input type="number" id="bc-bottom-ux" placeholder="0.00" step="0.01" value="0.00"></span>
+      <span class="bc-input-wrap"><span class="bc-axis">Vy</span><span class="bc-eq">=</span><input type="number" id="bc-bottom-uy" placeholder="0.00" step="0.01" value="0.00"></span>
+      <label class="zero-grad"><input type="checkbox" id="bc-bottom-zerograd"> Zero ∇</label>
+    </div>
+    <div class="bc-panel bc-left" id="bc-left">
+      <label>Left</label>
+      <span class="bc-input-wrap"><span class="bc-axis">Vx</span><span class="bc-eq">=</span><input type="number" id="bc-left-ux" placeholder="0.00" step="0.01" value="0.00"></span>
+      <span class="bc-input-wrap"><span class="bc-axis">Vy</span><span class="bc-eq">=</span><input type="number" id="bc-left-uy" placeholder="0.00" step="0.01" value="0.00"></span>
+      <label class="zero-grad"><input type="checkbox" id="bc-left-zerograd"> Zero ∇</label>
+    </div>
+    <div class="bc-panel bc-right" id="bc-right">
+      <label>Right</label>
+      <span class="bc-input-wrap"><span class="bc-axis">Vx</span><span class="bc-eq">=</span><input type="number" id="bc-right-ux" placeholder="0.00" step="0.01" value="0.00"></span>
+      <span class="bc-input-wrap"><span class="bc-axis">Vy</span><span class="bc-eq">=</span><input type="number" id="bc-right-uy" placeholder="0.00" step="0.01" value="0.00"></span>
+      <label class="zero-grad"><input type="checkbox" id="bc-right-zerograd"> Zero ∇</label>
+    </div>
+    <canvas id="canvas" width="800" height="600"></canvas>
+  </div>
+  <div id="colorbar-wrap" class="colorbar-wrap">
+    <div class="colorbar-title">Velocity magnitude [m/s]</div>
+    <div class="colorbar-bar" id="colorbar-bar"></div>
+    <div class="colorbar-ticks">
+      <span class="colorbar-tick" id="colorbar-tick-0">0</span>
+      <span class="colorbar-tick" id="colorbar-tick-1"></span>
+      <span class="colorbar-tick" id="colorbar-tick-2"></span>
+      <span class="colorbar-tick" id="colorbar-tick-3"></span>
+      <span class="colorbar-tick" id="colorbar-tick-max">0.01</span>
+    </div>
+  </div>
+  <p class="hint">Draw obstacles with the first tool; erase with the second. Use velocity to push fluid (drag); use particles to add tracers. Velocity on the four sides can be set via Dirichlet conditions in the text boxes (Ux, Uy) or via Neumann-type boundary conditions as zero gradient using the “Zero ∇” checkboxes.</p>
+  <script src="./js/core/math/MathUtils.js"></script>
+  <script src="./js/utils/Utils.js"></script>
+  <script src="./js/core/solvers/FluidSolver.js"></script>
+  <script src="./js/core/solvers/ParticleSolver.js"></script>
+  <script src="./js/core/obstacles/ObstacleManager.js"></script>
+  <script src="./js/core/graphics/ObstacleContour.js"></script>
+  <script src="./js/core/graphics/Renderer.js"></script>
+  <script src="./js/controls/Interaction.js"></script>
+  <script src="./js/core/FluidApp.js"></script>
+  <script src="./js/index.js"></script>
+</body>
+</html>

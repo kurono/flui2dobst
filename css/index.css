@@ -1,0 +1,202 @@
+/**
+ * Styles for 2D Fluid Solver with Obstacles
+ * @author Ilya Tsivilskiy
+ */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #0f0f1a;
+  color: #e0e0e0;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+}
+
+h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.toolbar button {
+  padding: 8px 14px;
+  border: 1px solid #444;
+  border-radius: 6px;
+  background: #252535;
+  color: #e0e0e0;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.toolbar button:hover {
+  background: #353550;
+}
+
+.toolbar button.active {
+  background: #4a4a7a;
+  border-color: #6a6aaa;
+}
+
+.sim-time {
+  text-align: center;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 8px;
+  color: #b0b0c0;
+}
+
+#canvas-wrap {
+  position: relative;
+  display: inline-block;
+  margin: 0 auto;
+  padding-top: 56px;
+  padding-bottom: 56px;
+}
+
+#canvas {
+  display: block;
+  width: 100%;
+  max-width: 90vmin;
+  height: 70vmin;
+  max-height: 600px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  cursor: crosshair;
+}
+
+.bc-panel {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: rgba(15, 15, 26, 0.9);
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+.bc-panel label {
+  font-size: 0.7rem;
+  color: #888;
+}
+
+.bc-input-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  position: relative;
+}
+
+.bc-panel.zero-grad-active .bc-input-wrap::after {
+  content: '';
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  top: 50%;
+  height: 2px;
+  background: #c44;
+  transform: rotate(-12deg);
+  pointer-events: none;
+}
+
+.bc-axis {
+  font-size: 0.75rem;
+  color: #aaa;
+}
+
+.bc-eq {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.bc-panel input[type="number"] {
+  width: 52px;
+  padding: 4px 6px;
+  font-size: 0.8rem;
+  background: #252535;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #e0e0e0;
+}
+
+.bc-panel input[type="checkbox"] {
+  margin: 0;
+  accent-color: #6a6aaa;
+}
+
+.bc-panel .zero-grad {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  color: #aaa;
+}
+
+.bc-top { top: 0; left: 50%; transform: translateX(-50%); }
+.bc-bottom { bottom: 0; left: 50%; transform: translateX(-50%); }
+.bc-left { left: 8px; top: 50%; transform: translateY(-50%); }
+.bc-right { right: 8px; top: 50%; transform: translateY(-50%); }
+
+.colorbar-wrap {
+  width: 100%;
+  max-width: 90vmin;
+  margin: 12px auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.colorbar-title {
+  font-size: 0.85rem;
+  color: #aaa;
+}
+
+/* Same colormap as Renderer: hue from 240 (blue) to 0 (red), S=80%, L=50% */
+.colorbar-bar {
+  width: 100%;
+  height: 14px;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background: linear-gradient(
+    to right,
+    hsl(240, 80%, 50%) 0%,
+    hsl(192, 80%, 50%) 20%,
+    hsl(144, 80%, 50%) 40%,
+    hsl(96, 80%, 50%) 60%,
+    hsl(48, 80%, 50%) 80%,
+    hsl(0, 80%, 50%) 100%
+  );
+}
+
+.colorbar-ticks {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 2px;
+}
+
+.colorbar-tick {
+  font-size: 0.75rem;
+  color: #888;
+  font-variant-numeric: tabular-nums;
+}
+
+.hint {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: #888;
+}
