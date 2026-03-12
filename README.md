@@ -1,8 +1,8 @@
-# 2D Fluid Solver with Obstacles
+# 2D Fluid Solver with Obstacles and Particles
 
 **Author:** Ilya Tsivilskiy
 
-A browser-based, interactive 2D incompressible Navier–Stokes solver with immersed obstacles and Lagrangian tracer particles. The fluid is simulated on a Cartesian grid with free-slip boundary conditions on solid boundaries; optional tracer particles follow the flow with drag and gravity and collide with obstacles.
+A web browser-based, interactive 2D incompressible Navier–Stokes solver with immersed obstacles and Lagrangian tracer particles. The fluid is simulated on a Cartesian grid with free-slip boundary conditions on solid boundaries; optional tracer particles follow the flow with drag and gravity and collide with obstacles.
 
 ---
 
