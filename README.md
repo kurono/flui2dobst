@@ -22,7 +22,7 @@ The app is primarily a **toy model for educational purposes**, but it can illust
 - **Vortex shedding** — place an obstacle (e.g. a blob or cylinder-like shape) in the path of a uniform or shear flow (set via BCs or the velocity brush) and watch the von Kármán street.
 - **Flow in a channel** — use obstacles to form walls and set inlet/outlet-like conditions on the sides to mimic channel flow.
 - **Air wind tunnel** — prescribe inflow on one side and zero gradient or outflow on the opposite side; add obstacles to represent models and use particles to visualize streamlines or dust/droplets with a physically consistent drag law.
-- **Particles with correct drag law** — tracer particles use the Morsi–Alexander $C_d(\mathrm{Re})$ correlation, so they respond realistically to the local flow and Reynolds number (Stokes and beyond), suitable for qualitative studies of particle transport, settling, or dispersion in 2D flows.
+- **Particles with correct drag law** — tracer particles use the Morsi–Alexander *C*<sub>*d*</sub>(Re) correlation, so they respond realistically to the local flow and Reynolds number (Stokes and beyond), suitable for qualitative studies of particle transport, settling, or dispersion in 2D flows.
 
 ---
 
@@ -72,61 +72,59 @@ The solver applies these each step when updating velocity boundary values.
 **Fluid (incompressible 2D Navier–Stokes):**
 
 Momentum:
-$$
-\frac{\partial \mathbf{u}}{\partial t} + (\mathbf{u} \cdot \nabla) \mathbf{u} = -\nabla p + \nu \nabla^2 \mathbf{u}
-$$
+
+$$\frac{\partial \mathbf{u}}{\partial t} + (\mathbf{u} \cdot \nabla) \mathbf{u} = -\nabla p + \nu \nabla^2 \mathbf{u}$$
 
 Continuity (incompressibility):
-$$
-\nabla \cdot \mathbf{u} = 0
-$$
 
-Here $\mathbf{u} = (u, v)$ is the velocity, $p$ is pressure (divided by constant density), and $\nu$ is the kinematic viscosity.
+$$\nabla \cdot \mathbf{u} = 0$$
 
-**Solid boundaries:** Free-slip: zero normal velocity and no shear stress. So on the solid surface, $\partial p / \partial n = 0$ and the velocity is projected onto the tangent direction (no penetration, no tangential friction).
+Here **u** = (*u*, *v*) is the velocity, *p* is pressure (divided by constant density), and *ν* is the kinematic viscosity.
+
+**Solid boundaries:** Free-slip: zero normal velocity and no shear stress. So on the solid surface, ∂*p*/∂*n* = 0 and the velocity is projected onto the tangent direction (no penetration, no tangential friction).
 
 **Tracer particles:** Each particle obeys
-$$
-\frac{\mathrm{d}\mathbf{u}_p}{\mathrm{d}t} = \frac{\mathbf{u} - \mathbf{u}_p}{\tau_p} + \mathbf{g}\,\frac{\rho_p - \rho}{\rho_p} + \mathbf{a},
-$$
-where $\mathbf{u}_p$ is particle velocity, $\mathbf{u}$ is fluid velocity at the particle position, $\tau_p$ is the particle relaxation time, $\mathbf{g}$ is gravity, $\rho_p$ and $\rho$ are particle and fluid density, and $\mathbf{a}$ is any extra acceleration (here zero). The relaxation time is
-$$
-\tau_p = \frac{24}{18}\,\frac{\rho_p d_p^2}{\mu C_d \mathrm{Re}},
-$$
-with particle diameter $d_p$, dynamic viscosity $\mu$, drag coefficient $C_d(\mathrm{Re})$, and particle Reynolds number $\mathrm{Re} = |\mathbf{u} - \mathbf{u}_p|\,d_p / \nu$. $C_d(\mathrm{Re})$ is given by the Morsi–Alexander (1972) correlation for a sphere over a range of $\mathrm{Re}$ (Stokes regime and beyond). When a particle hits the solid, its velocity is reflected about the surface normal and multiplied by $(1 - \text{damp})$ to model inelastic collision.
+
+$$\frac{\mathrm{d}\mathbf{u}_p}{\mathrm{d}t} = \frac{\mathbf{u} - \mathbf{u}_p}{\tau_p} + \mathbf{g}\,\frac{\rho_p - \rho}{\rho_p} + \mathbf{a},$$
+
+where **u**<sub>*p*</sub> is particle velocity, **u** is fluid velocity at the particle position, τ<sub>*p*</sub> is the particle relaxation time, **g** is gravity, ρ<sub>*p*</sub> and ρ are particle and fluid density, and **a** is any extra acceleration (here zero). The relaxation time is
+
+$$\tau_p = \frac{24}{18}\,\frac{\rho_p d_p^2}{\mu C_d \mathrm{Re}},$$
+
+with particle diameter *d*<sub>*p*</sub>, dynamic viscosity *μ*, drag coefficient *C*<sub>*d*</sub>(Re), and particle Reynolds number Re = |**u** − **u**<sub>*p*</sub>| *d*<sub>*p*</sub> / *ν*. *C*<sub>*d*</sub>(Re) is given by the Morsi–Alexander (1972) correlation for a sphere over a range of Re (Stokes regime and beyond). When a particle hits the solid, its velocity is reflected about the surface normal and multiplied by (1 − damp) to model inelastic collision.
 
 ---
 
 ### What is accounted for
 
 - **Advection:** Semi-Lagrangian (backtrace and interpolate) so the scheme is stable for large CFL.
-- **Pressure:** Pressure Poisson equation with a liquid-only Laplacian (solid cells do not contribute), so that $\nabla \cdot \mathbf{u} = 0$ is enforced and the pressure gradient is applied only in the fluid. Boundary conditions are zero gradient on top/bottom and zero (or copy) on left/right for pressure.
+- **Pressure:** Pressure Poisson equation with a liquid-only Laplacian (solid cells do not contribute), so that ∇·**u** = 0 is enforced and the pressure gradient is applied only in the fluid. Boundary conditions are zero gradient on top/bottom and zero (or copy) on left/right for pressure.
 - **Diffusion:** Implicit (backward Euler in time, Laplacian in space), solved with Gauss–Seidel iteration.
 - **Vorticity confinement:** An extra force proportional to the gradient of vorticity is added to counteract numerical dissipation of small-scale vorticity (optional strength parameter).
 - **Obstacles:** Solid mask is smoothed (e.g. 3×3 average) and binarized so that surface normals (from the gradient of the mask) are well-defined. Velocity in solid is set to zero; at fluid nodes adjacent to solid, velocity is projected onto the local tangent to enforce free-slip.
-- **Particles:** Fluid velocity and solid/normal at the particle position are obtained by bilinear interpolation from the grid. Velocity is advanced with the analytical solution of $\mathrm{d}u/\mathrm{d}t = A u + B$ over a time step; position is advanced with the updated velocity. Collision: if the new position is inside the solid, velocity is reflected and damped and position is re-advanced.
+- **Particles:** Fluid velocity and solid/normal at the particle position are obtained by bilinear interpolation from the grid. Velocity is advanced with the analytical solution of d*u*/d*t* = *A* *u* + *B* over a time step; position is advanced with the updated velocity. Collision: if the new position is inside the solid, velocity is reflected and damped and position is re-advanced.
 
 ---
 
 ### Numerical methods and solver structure
 
-The scheme follows a nodal, finite-difference style implementation on a 2D Cartesian grid (collocated $u$, $v$, $p$, and solid mask at the same nodes). The time step is fixed.
+The scheme follows a nodal, finite-difference style implementation on a 2D Cartesian grid (collocated *u*, *v*, *p*, and solid mask at the same nodes). The time step is fixed.
 
 **Spatial discretization:**
 
-- Central differences for $\partial/\partial x$, $\partial/\partial y$, so divergence, gradient, and curl are second-order in the interior.
+- Central differences for ∂/∂*x*, ∂/∂*y*, so divergence, gradient, and curl are second-order in the interior.
 - Scalar fields are sampled at arbitrary physical coordinates via bilinear interpolation from the four surrounding nodes.
 - Boundary conditions are applied by overwriting boundary values (copy from interior for Neumann, prescribed for Dirichlet).
 
 **Time step (fluid), per step:**
 
-1. **Vorticity confinement:** Compute vorticity $\omega = \partial v/\partial x - \partial u/\partial y$, then its gradient; add a force along the gradient of $\omega$ (vorticity confinement). Update $\mathbf{u}$ with this force and apply free-slip (solid).
-2. **Advection:** For each component, semi-Lagrangian step: for each grid point, backtrace $\mathbf{x} - \mathbf{u}(\mathbf{x})\,\Delta t$ and set the new value to the interpolated value of the old field at that point. Apply velocity BCs and free-slip.
-3. **Pressure (first solve):** Compute divergence of $\mathbf{u}$, set the pressure source as divergence/$\Delta t$ (zero in solid). Solve the Poisson equation $-\nabla^2 p = \text{source}$ in the fluid (Gauss–Seidel, with liquid-only stencil). Apply pressure BCs. Then update $\mathbf{u} \leftarrow \mathbf{u} - \Delta t\,\nabla p$ and apply free-slip.
-4. **Diffusion:** Solve $\partial s/\partial t = \nu \nabla^2 s$ implicitly for each velocity component (Gauss–Seidel). Apply velocity BCs and free-slip.
-5. **Pressure (second solve):** Same as step 3. Final $\mathbf{u}$ and $p$ are used for the next step and for particle advection.
+1. **Vorticity confinement:** Compute vorticity ω = ∂*v*/∂*x* − ∂*u*/∂*y*, then its gradient; add a force along the gradient of ω (vorticity confinement). Update **u** with this force and apply free-slip (solid).
+2. **Advection:** For each component, semi-Lagrangian step: for each grid point, backtrace **x** − **u**(**x**) Δ*t* and set the new value to the interpolated value of the old field at that point. Apply velocity BCs and free-slip.
+3. **Pressure (first solve):** Compute divergence of **u**, set the pressure source as divergence/Δ*t* (zero in solid). Solve the Poisson equation −∇²*p* = source in the fluid (Gauss–Seidel, with liquid-only stencil). Apply pressure BCs. Then update **u** ← **u** − Δ*t* ∇*p* and apply free-slip.
+4. **Diffusion:** Solve ∂*s*/∂*t* = *ν* ∇²*s* implicitly for each velocity component (Gauss–Seidel). Apply velocity BCs and free-slip.
+5. **Pressure (second solve):** Same as step 3. Final **u** and *p* are used for the next step and for particle advection.
 
-**Particles:** After the fluid step, each particle is advanced: sample $\mathbf{u}$ at the particle, compute $\mathrm{Re}$ and $C_d$, then $\tau_p$; form $A = -1/\tau_p$ and $\mathbf{B}$ from drag and gravity; integrate velocity analytically over $\Delta t$; integrate position; if the new position is in the solid, reflect and damp velocity and re-advance position. Particles that end in solid or outside the domain are removed.
+**Particles:** After the fluid step, each particle is advanced: sample **u** at the particle, compute Re and *C*<sub>*d*</sub>, then τ<sub>*p*</sub>; form *A* = −1/τ<sub>*p*</sub> and **B** from drag and gravity; integrate velocity analytically over Δ*t*; integrate position; if the new position is in the solid, reflect and damp velocity and re-advance position. Particles that end in solid or outside the domain are removed.
 
 **Obstacles:** Drawn/erased as circles in physical space; the solid mask is set to 1 (solid) or 0 (fluid) in affected cells. After a draw/erase action, the mask is smoothed (3×3 box filter) and binarized at 0.5 so the interface is smooth and normals are stable.
 
@@ -136,15 +134,42 @@ The algorithms and equation ordering (vorticity → advect → pressure → diff
 
 ### Project layout
 
-- **`index.html`** — Entry page, toolbar, BC panels, canvas, script order.
-- **`js/main.js`** — Creates and starts the app.
-- **`js/FluidApp.js`** — Configuration (grid, time step, viscosity, BC, particle params), state (fluid, particles), main loop (fixed-step integration, colormap limit every 10 steps), reset, BC UI, toolbar.
-- **`js/FluidSolver.js`** — Grid indexing, physical/grid coordinates, interpolation, derivatives (ddx, ddy, div, grad), BCs, vorticity, solid normals/tangent/projection, free-slip, advection, diffusion, pressure Poisson, full fluid step.
-- **`js/ParticleSolver.js`** — Drag coefficient $C_d(\mathrm{Re})$, reflection, linear ODE integration, particle step (drag, gravity, collision, removal).
-- **`js/ObstacleManager.js`** — Draw/erase circles on the solid mask, smooth, binarize, expose solid normals (via FluidSolver).
-- **`js/Renderer.js`** — Map physical domain to canvas, velocity magnitude to color (HSL), draw cells, arrows, particles.
-- **`js/Interaction.js`** — Tool modes (obstacle, eraser, velocity, particles), pointer handlers, velocity brush, particle injection.
-- **`css/index.css`** — Layout and styling for toolbar, BC panels, canvas.
+```
+index.html
+css/
+  index.css
+js/
+  index.js
+  core/
+    FluidApp.js
+    math/
+      MathUtils.js
+    solvers/
+      FluidSolver.js
+      ParticleSolver.js
+    obstacles/
+      ObstacleManager.js
+    graphics/
+      ObstacleContour.js
+      Renderer.js
+  controls/
+    Interaction.js
+  utils/
+    Utils.js
+```
+
+- **`index.html`** — Entry page: toolbar, BC panels, canvas, and script load order.
+- **`css/index.css`** — Layout and styling for toolbar, BC panels, and canvas.
+- **`js/index.js`** — Entry point: creates and starts the app.
+- **`js/core/FluidApp.js`** — Configuration (grid, time step, viscosity, BC, particle params), state (fluid, particles), main loop (fixed-step integration, colormap limit every 10 steps), reset, BC UI, and toolbar wiring.
+- **`js/core/math/MathUtils.js`** — Shared math: clamp, lerp, and small epsilon for safe division and comparisons.
+- **`js/core/solvers/FluidSolver.js`** — Grid indexing, physical/grid coordinates, interpolation, derivatives (ddx, ddy, div, grad), BCs, vorticity, solid normals/tangent/projection, free-slip, advection, diffusion, pressure Poisson, and full fluid step.
+- **`js/core/solvers/ParticleSolver.js`** — Drag coefficient *C*<sub>*d*</sub>(Re), reflection, linear ODE integration, and particle step (drag, gravity, collision, removal).
+- **`js/core/obstacles/ObstacleManager.js`** — Draw/erase circles on the solid mask, smooth, binarize; solid normals are exposed via FluidSolver.
+- **`js/core/graphics/ObstacleContour.js`** — Marching-squares contour of the obstacle mask for rendering.
+- **`js/core/graphics/Renderer.js`** — Map physical domain to canvas, velocity magnitude to color (HSL), draw cells, arrows, and particles.
+- **`js/controls/Interaction.js`** — Tool modes (obstacle, eraser, velocity, particles), pointer handlers, velocity brush, and particle injection.
+- **`js/utils/Utils.js`** — General utilities (e.g. FPS meter).
 
 ---
 
