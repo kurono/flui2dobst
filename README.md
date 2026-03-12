@@ -24,6 +24,28 @@ The app is primarily a **toy model for educational purposes**, but it can illust
 - **Air wind tunnel** — prescribe inflow on one side and zero gradient or outflow on the opposite side; add obstacles to represent models and use particles to visualize streamlines or dust/droplets with a physically consistent drag law.
 - **Particles with correct drag law** — tracer particles use the Morsi–Alexander *C*<sub>*d*</sub>(Re) correlation, so they respond realistically to the local flow and Reynolds number (Stokes and beyond), suitable for qualitative studies of particle transport, settling, or dispersion in 2D flows.
 
+### Demo animations
+
+Solution animations are stored as GIFs in [`./assets/demos`](./assets/demos). Each illustrates a different flow regime or feature.
+
+- **Lid-driven cavity** (`flui2dobst_lid_driven_cavity.gif`) — Classic lid-driven flow in a square cavity. Reynolds number is controlled via the lid velocity; the animation shows the resulting recirculation and secondary vortices.
+
+  ![Lid-driven cavity](assets/demos/flui2dobst_lid_driven_cavity.gif)
+
+- **Vortex shedding** (`flui2dobst_vortex_shedding.gif`) — Transient flow pattern called *vortex shedding* behind a cylindrical obstacle. The alternating vortices form the well-known von Kármán street.
+
+  ![Vortex shedding](assets/demos/flui2dobst_vortex_shedding.gif)
+
+- **Airfoil in the wind tunnel** (`flui2dobst_air_foil_in_the_wind_tunnel.gif`) — Three different airfoil profiles placed in a wind tunnel; inflow and outflow are set via boundary conditions.
+
+  ![Airfoil in the wind tunnel](assets/demos/flui2dobst_air_foil_in_the_wind_tunnel.gif)
+
+- **User–fluid interaction** (`flui2dobst_user_fluid_interaction.gif`) — Shows how the user can dynamically specify and adjust boundary conditions on the domain edges, and inject velocity and particles locally with respect to mouse position and movement direction.
+
+  ![User–fluid interaction](assets/demos/flui2dobst_user_fluid_interaction.gif)
+
+*Note:* The app does not have built-in ability to save GIFs; these animations were captured via standard Windows display-recording software.
+
 ---
 
 ## 2. How to use
