@@ -11,7 +11,7 @@ class Renderer {
    * @param {HTMLCanvasElement} canvas - Target canvas
    * @param {number} L - Domain size [m] (used for scale and extent)
    */
-  /** Upsample factor for velocity magnitude drawing (bilinear). */
+  /** Upsample factor for velocity magnitude drawing (bilinear); 2× for smoother visual. */
   static UPSAMPLE = 2;
 
   constructor(canvas, L) {
@@ -134,6 +134,7 @@ class Renderer {
   render(fluidState, particles, res, h, maxMag, options = {}) {
     const { Ux, Uy, solid } = fluidState;
     const obstaclesDirty = options.obstaclesDirty === true;
+    const k = options.upsample != null ? options.upsample : Renderer.UPSAMPLE;
     if (obstaclesDirty || this._cachedContourRes !== res) {
       this._cachedContourSegments = ObstacleContour.build(solid, res, 0.5);
       this._cachedContourRes = res;
@@ -160,7 +161,6 @@ class Renderer {
     }
     this.ctx.fillStyle = '#1a1a2e';
     this.ctx.fillRect(0, 0, width, height);
-    const k = Renderer.UPSAMPLE;
     const subW = cellW / k;
     const subH = cellH / k;
     for (let sy = 0; sy < res * k; sy++) {

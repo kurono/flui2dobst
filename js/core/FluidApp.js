@@ -19,8 +19,6 @@ class FluidApp {
   static L = 0.021;
   /** @type {number} Fixed time step [s]. */
   static fixedDt = 8e-4;
-  /** Render once per this many fluid steps (e.g. 3 steps per 1 frame). */
-  static RENDER_EVERY_N_STEPS = 3;
 
   constructor() {
     this.h = FluidApp.L / (FluidApp.RES - 1);
@@ -80,8 +78,6 @@ class FluidApp {
     this.fluidStepCount = 0;
     /** Velocity magnitude scale for colormap; recomputed every 10 fluid steps */
     this.colormapMaxMag = 0.01;
-    /** Count steps this frame; render every RENDER_EVERY_N_STEPS. */
-    this._stepCounter = 0;
   }
 
   /**
@@ -190,11 +186,7 @@ class FluidApp {
       this.simTime += FluidApp.fixedDt;
       this.fluidStepCount++;
       stepsThisFrame++;
-      this._stepCounter++;
-      if (this._stepCounter >= FluidApp.RENDER_EVERY_N_STEPS) {
-        this._stepCounter = 0;
-        doRender = true;
-      }
+      doRender = true;
       if (this.fluidStepCount % 10 === 0) {
         const maxU = FluidSolver.getMaxFluidVelocity(
           this.fluidState.Ux, this.fluidState.Uy, this.fluidState.solid, FluidApp.RES
@@ -203,8 +195,10 @@ class FluidApp {
       }
     }
     if (doRender || stepsThisFrame === 0) {
+      const upsample = document.getElementById('opt-upsample')?.checked ? 2 : 1;
       this.renderer.render(this.fluidState, this.particles, FluidApp.RES, this.h, this.colormapMaxMag, {
-        obstaclesDirty: this.obstaclesDirty
+        obstaclesDirty: this.obstaclesDirty,
+        upsample
       });
       this.obstaclesDirty = false;
       this.#updateTimeAndColorbar();

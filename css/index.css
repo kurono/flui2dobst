@@ -49,6 +49,20 @@ h1 {
   border-color: #6a6aaa;
 }
 
+.toolbar-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: #b0b0c0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toolbar-check input {
+  cursor: pointer;
+}
+
 .sim-time {
   text-align: center;
   font-size: 1rem;
