@@ -79,17 +79,17 @@ Continuity (incompressibility):
 
 $$\nabla \cdot \mathbf{u} = 0$$
 
-Here **u** = (*u*, *v*) is the velocity, *p* is pressure (divided by constant density), and *ν* is the kinematic viscosity.
+Here **u** = (*u*, *v*) is the velocity, *p* is pressure, and *ν* is the kinematic viscosity.
 
 **Solid boundaries:** Free-slip: zero normal velocity and no shear stress. So on the solid surface, ∂*p*/∂*n* = 0 and the velocity is projected onto the tangent direction (no penetration, no tangential friction).
 
 **Tracer particles:** Each particle obeys
 
-$$\frac{\mathrm{d}\mathbf{u}_p}{\mathrm{d}t} = \frac{\mathbf{u} - \mathbf{u}_p}{\tau_p} + \mathbf{g}\,\frac{\rho_p - \rho}{\rho_p} + \mathbf{a},$$
+$$\frac{\mathrm{d}\mathbf{u}_p}{\mathrm{d}t} = \frac{\mathbf{u} - \mathbf{u}_p}{\tau_p} + \mathbf{g}\ \cdot \frac{\rho_p - \rho}{\rho_p} + \mathbf{a},$$
 
 where **u**<sub>*p*</sub> is particle velocity, **u** is fluid velocity at the particle position, τ<sub>*p*</sub> is the particle relaxation time, **g** is gravity, ρ<sub>*p*</sub> and ρ are particle and fluid density, and **a** is any extra acceleration (here zero). The relaxation time is
 
-$$\tau_p = \frac{24}{18}\,\frac{\rho_p d_p^2}{\mu C_d \mathrm{Re}},$$
+$$\tau_p = \frac{24}{18}\ \cdot \frac{\rho_p d_p^2}{\mu C_d \mathrm{Re}},$$
 
 with particle diameter *d*<sub>*p*</sub>, dynamic viscosity *μ*, drag coefficient *C*<sub>*d*</sub>(Re), and particle Reynolds number Re = |**u** − **u**<sub>*p*</sub>| *d*<sub>*p*</sub> / *ν*. *C*<sub>*d*</sub>(Re) is given by the Morsi–Alexander (1972) correlation for a sphere over a range of Re (Stokes regime and beyond). When a particle hits the solid, its velocity is reflected about the surface normal and multiplied by (1 − damp) to model inelastic collision.
 
@@ -100,7 +100,7 @@ with particle diameter *d*<sub>*p*</sub>, dynamic viscosity *μ*, drag coefficie
 - **Advection:** Semi-Lagrangian (backtrace and interpolate) so the scheme is stable for large CFL.
 - **Pressure:** Pressure Poisson equation with a liquid-only Laplacian (solid cells do not contribute), so that ∇·**u** = 0 is enforced and the pressure gradient is applied only in the fluid. Boundary conditions are zero gradient on top/bottom and zero (or copy) on left/right for pressure.
 - **Diffusion:** Implicit (backward Euler in time, Laplacian in space), solved with Gauss–Seidel iteration.
-- **Vorticity confinement:** An extra force proportional to the gradient of vorticity is added to counteract numerical dissipation of small-scale vorticity (optional strength parameter).
+- **Vorticity confinement:** An extra force proportional to the gradient of vorticity is added to counteract numerical dissipation of small-scale vorticity (optional strength parameter). Vorticity (2D, *z*-component): ω = ∂*v*/∂*x* − ∂*u*/∂*y*. Unit vector **N** = ∇ω/|∇ω| points toward higher |ω|. The confinement force is **f** = *ε* *h* (**N** × ω **k**) in the plane, i.e. **f** = *ε* *h* (−*N*<sub>*y*</sub> ω, *N*<sub>*x*</sub> ω), with strength *ε* (and grid size *h*) so that vorticity is reinforced.
 - **Obstacles:** Solid mask is smoothed (e.g. 3×3 average) and binarized so that surface normals (from the gradient of the mask) are well-defined. Velocity in solid is set to zero; at fluid nodes adjacent to solid, velocity is projected onto the local tangent to enforce free-slip.
 - **Particles:** Fluid velocity and solid/normal at the particle position are obtained by bilinear interpolation from the grid. Velocity is advanced with the analytical solution of d*u*/d*t* = *A* *u* + *B* over a time step; position is advanced with the updated velocity. Collision: if the new position is inside the solid, velocity is reflected and damped and position is re-advanced.
 
@@ -118,7 +118,7 @@ The scheme follows a nodal, finite-difference style implementation on a 2D Carte
 
 **Time step (fluid), per step:**
 
-1. **Vorticity confinement:** Compute vorticity ω = ∂*v*/∂*x* − ∂*u*/∂*y*, then its gradient; add a force along the gradient of ω (vorticity confinement). Update **u** with this force and apply free-slip (solid).
+1. **Vorticity confinement:** Compute vorticity ω = ∂*v*/∂*x* − ∂*u*/∂*y*, then **N** = ∇ω/|∇ω|; add force **f** = *ε* *h* (−*N*<sub>*y*</sub> ω, *N*<sub>*x*</sub> ω). Update **u** with this force and apply free-slip (solid).
 2. **Advection:** For each component, semi-Lagrangian step: for each grid point, backtrace **x** − **u**(**x**) Δ*t* and set the new value to the interpolated value of the old field at that point. Apply velocity BCs and free-slip.
 3. **Pressure (first solve):** Compute divergence of **u**, set the pressure source as divergence/Δ*t* (zero in solid). Solve the Poisson equation −∇²*p* = source in the fluid (Gauss–Seidel, with liquid-only stencil). Apply pressure BCs. Then update **u** ← **u** − Δ*t* ∇*p* and apply free-slip.
 4. **Diffusion:** Solve ∂*s*/∂*t* = *ν* ∇²*s* implicitly for each velocity component (Gauss–Seidel). Apply velocity BCs and free-slip.
