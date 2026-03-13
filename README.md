@@ -80,10 +80,10 @@ The solver applies these each step when updating velocity boundary values.
 ### Display
 
 - **Background:** Dark blue-gray.
-- **Fluid cells:** Colored by velocity magnitude (blue = low, red = high). The scale is recomputed every 10 fluid time steps from the current maximum velocity in the domain.
-- **Solid cells:** Dark gray.
-- **Velocity arrows:** Subsampled arrows show flow direction; arrowheads indicate direction.
-- **Particles:** White dots.
+- **Fluid cells:** Colored by velocity magnitude (blue = low, green = intermediate, red = high). The scale is recomputed every 10 fluid time steps from the current maximum velocity in the domain.
+- **Solid cells:** Blue.
+- **Velocity arrows:** Subsampled arrows show normalized flow direction vectors;
+- **Particles:** Black dots.
 
 ---
 
@@ -107,11 +107,11 @@ Here **u** = (*u*, *v*) is the velocity, *p* is pressure, and *ν* is the kinema
 
 **Tracer particles:** Each particle obeys
 
-$$\frac{\mathrm{d}\mathbf{u}_p}{\mathrm{d}t} = \frac{\mathbf{u} - \mathbf{u}_p}{\tau_p} + \mathbf{g}\ \cdot \frac{\rho_p - \rho}{\rho_p} + \mathbf{a},$$
+$$\frac{\mathrm{d}\mathbf{u}_p}{\mathrm{d}t} = \frac{\mathbf{u} - \mathbf{u}_p}{\tau_p} + \mathbf{g}\ \frac{\rho_p - \rho}{\rho_p} + \mathbf{a},$$
 
 where **u**<sub>*p*</sub> is particle velocity, **u** is fluid velocity at the particle position, τ<sub>*p*</sub> is the particle relaxation time, **g** is gravity, ρ<sub>*p*</sub> and ρ are particle and fluid density, and **a** is any extra acceleration (here zero). The relaxation time is
 
-$$\tau_p = \frac{24}{18}\ \cdot \frac{\rho_p d_p^2}{\mu C_d \mathrm{Re}},$$
+$$\tau_p = \frac{24}{18}\ \frac{\rho_p d_p^2}{\mu C_d \mathrm{Re}},$$
 
 with particle diameter *d*<sub>*p*</sub>, dynamic viscosity *μ*, drag coefficient *C*<sub>*d*</sub>(Re), and particle Reynolds number Re = |**u** − **u**<sub>*p*</sub>| *d*<sub>*p*</sub> / *ν*. *C*<sub>*d*</sub>(Re) is given by the Morsi–Alexander (1972) correlation for a sphere over a range of Re (Stokes regime and beyond). When a particle hits the solid, its velocity is reflected about the surface normal and multiplied by (1 − damp) to model inelastic collision.
 
